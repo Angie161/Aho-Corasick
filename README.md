@@ -31,7 +31,8 @@ Para esto se comienza desde la raíz e inserta cada patrón carácter por carác
 - Si no existe una arista asociada al carácter actual, se crea un nuevo nodo y se le conecta al *trie* a través de una arista etiquetada con dicho carácter. Más adelante, estas conexiones serán conocidas como **transiciones**.
 - Por otra parte, si la arista ya existe, se continúa a través de ella y se repite la secuencia hasta completar el patrón.
 
-> **Figura 1.** Ejemplo de construcción de un *trie* con conjunto de patrones {morsa, orca}.
+![Figura 1: Ejemplo de construcción de un *trie* con conjunto de patrones {morsa, orca}.](Imagenes/Ejemplo_Trie.png)
+> Figura 1: Ejemplo de construcción de un *trie* con conjunto de patrones {morsa, orca}.
 
 Durante la construcción, cada nodo del *trie* posee información relevante para el funcionamiento posterior del autómata.  
 Para efectos de mejor comprensión, se puede asociar a cada nodo una etiqueta con la cadena formada desde la raíz hasta ese punto, facilitando la visualización del proceso.
@@ -57,6 +58,7 @@ Desde ese nuevo nodo se intenta procesar nuevamente el carácter *c*, generando 
 
 La idea detrás de esta construcción es optimizar la búsqueda durante la lectura del texto. A medida que se procesa el texto y se desciende por el *trie*, puede ocurrir que el carácter actual no tenga una transición válida en la rama que se está revisando. En lugar de reiniciar la búsqueda desde la raíz, el algoritmo utiliza los **suffix links** para crear “atajos” que permitan continuar la exploración sin perder el contexto acumulado. Estos atajos redirigen la búsqueda hacia otro patrón de la lista que podría coincidir con la parte del texto que se está procesando. Gracias a este mecanismo, se aprovecha al máximo la información obtenida hasta ese punto y se evita repetir comparaciones innecesarias, logrando una búsqueda más eficiente y continua.
 
+![Figura 2:  Ejemplo de funcionamiento de los *suffix links* en un *trie* construido con los patrones {morsa, orca}](Imagenes/Ejemplo_Suffix_Link.png)
 > **Figura 2.** Ejemplo de funcionamiento de los *suffix links* en un *trie* construido con los patrones {morsa, orca}.
 
 En el ejemplo de la Figura 2, se está procesando el texto “morca”. Dado que al llegar al nodo *u* no existen transiciones con el carácter “c”, se redirige la búsqueda al sufijo propio más largo de “mor”, llegando hasta “or”. Así, aunque inicialmente se haya intentado reconocer el patrón “morsa” de forma equívoca, se logra encontrar el patrón “orca” sin reiniciar la búsqueda.
@@ -70,6 +72,7 @@ Para implementar este mecanismo, se deberá recorrer el *trie* con una **búsque
 I. El nodo raíz y todos sus hijos directos tendrán un `suffix_link` que apunta hacia la raíz.  
 II. Para cualquier otro nodo `v`: Sea `u` el nodo padre de `v`, y `c` el carácter en la arista `(u, v)`. Desde el nodo `u`, seguir su `suffix_link` hacia un nodo `w`. Si `w` posee una transición con `c`, el `suffix_link` de `v` apuntará al nodo alcanzado por dicha transición. En caso contrario, repetir el seguimiento de los `suffix_links` hasta encontrar una transición válida o llegar a la raíz.
 
+![Figura 3:  Ejemplo de construcción de `suffix_link` en un *trie* construido con los patrones {morsa, orca}.](Imagenes/Construccion_SL.png)
 > **Figura 3.** Ejemplo de construcción de `suffix_link` en un *trie* construido con los patrones {morsa, orca}.
 
 ---
@@ -88,6 +91,7 @@ Dentro del alrgoritmo, estos enlaces se generan en paralelo a los `suffix_links`
 
 Sea `T` el *trie* construido a partir de los patrones: {"sal","al","mal","ma","a"} (Figura 4). 
 
+![Figura 4:  **Trie** construido a partir de los patrones `{sal, al, mala, a, ma}`](Imagenes/EjemploUso.png)
 > Figura 4: **Trie** construido a partir de los patrones `{sal, al, mala, a, ma}`, con sus correspondientes **suffix links** en azul, **output links** en rojo y nodos enumerados.
 
 Se busca encontrar las coincidencias de estos patrones en el texto **“salamandra”**.  
